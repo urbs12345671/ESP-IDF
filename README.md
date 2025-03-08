@@ -13,7 +13,8 @@ Here is a list of the projects included in this repository:
 1. **blinky**: A simple "Hello World" project that blinks an LED on the ESP32
 2. **dht11_with_components**:  A DHT11 component for measuring temperature and humidity.
 3. **hc_sr04_with_components**: A HC_SR04 component for messuring distance.
-4. **ledc_buzzer**: Use ESP32 LEDC peripheral, which generating Pulse Width Modulated (PWM) signals, to play simply music. 
+4. **ledc_buzzer**: Use ESP32 LEDC peripheral, which generating Pulse Width Modulated (PWM) signals, to play simply music.
+5. **ky038**: A drive for KY-038 sound sensor. 
 ...
 
 ## Getting Started
