@@ -1,0 +1,16 @@
+# components/ttp223/idf_component.yml
+idf_component_manifest:
+  version: "1.0.0"
+  description: "ESP-IDF component for KY-038 microphone voice sound sensor"
+  maintainers: ["urbs12345671 <urbs12345671@gmail.comexample.com>"]
+  license: "MIT"
+  dependencies:
+    esp-idf:
+      version: ">=4.4"
+  targets:
+    - esp32
+    - esp32s2
+    - esp32s3
+    - esp32c3
+    - esp32c6
+    - esp32h2
