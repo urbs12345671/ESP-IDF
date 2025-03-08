@@ -1,4 +1,4 @@
-# components/ttp223/idf_component.yml
+# components/ky023/idf_component.yml
 idf_component_manifest:
   version: "1.0.0"
   description: "ESP-IDF component for KY-023 Dual Axis XY Game Joystick Controller"
