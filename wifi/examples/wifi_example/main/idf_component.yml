@@ -1,0 +1,4 @@
+dependencies:
+  urbs12345671/wifi:
+    version: "*"
+    override_path: "../../../"
