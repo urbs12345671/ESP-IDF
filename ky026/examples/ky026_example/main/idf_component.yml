@@ -1,0 +1,4 @@
+dependencies:
+  urbs12345671/ky026:
+    version: "*"
+    override_path: "../../../"
