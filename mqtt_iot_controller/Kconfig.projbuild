@@ -1,0 +1,29 @@
+menu "Wi-Fi Configuration"
+
+    config WIFI_SSID
+        string "Wi-Fi SSID"
+        default "myssid"
+        help
+            SSID (network name) to connect to
+
+    config WIFI_PASSWORD
+        string "Wi-Fi Password"
+        default "mypassword"
+        help
+            Wi-Fi password (WPA/WPA2/WPA3)
+
+    config WIFI_MAX_RETRIES
+        int "Maximum connection attempts"
+        range 0 255
+        default 5
+        help
+            Number of times to retry connection (0-255)
+
+    config WIFI_RETRY_TIMEOUT_MS
+        int "Retry timeout (milliseconds)"
+        default 5000
+        help
+            Delay between connection attempts
+endmenu
+
+  
