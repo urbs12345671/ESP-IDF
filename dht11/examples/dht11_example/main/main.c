@@ -1,7 +1,7 @@
-//#include <sys/lock.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/semphr.h"
+#include "nvs_flash.h"
 #include "esp_lcd_panel_io.h"
 #include "esp_lcd_panel_vendor.h"
 #include "esp_lcd_panel_ops.h"
@@ -12,47 +12,42 @@
 #include "esp_lcd_touch_xpt2046.h"
 #include "lvgl.h"
 #include "esp_lvgl_port.h"
+#include "driver/gpio.h"
 #include "lcd.h"
 #include "touch.h"
-#include "lvgl_demo_ui.h"
 #include "lvgl_van_ui.h"
-#include "driver/gpio.h"
-#include "ky026.h"
 #include "job.h"
+#include "dht11.h"
 
+#define DHT11_GPIO_PIN GPIO_NUM_27
 
 QueueHandle_t result_queue = NULL;
 QueueHandle_t job_queue = NULL;
 
 static const char *TAG = "main";
 
-static ky026_handle_t sensor = NULL;
-
 static void worker_task(void *arg) {
-    job_command_t cmd;
-    job_result_t res;
+    job_t job;
+    job_result_t job_result;
 
     while (1) {
         // Wait for incoming job commands
-        if (xQueueReceive(job_queue, &cmd, portMAX_DELAY)) {
-
+        if (xQueueReceive(job_queue, &job, portMAX_DELAY)) {
             //ESP_LOGI(TAG, "Job received (id = %d)", cmd.job_id);
 
-            bool digital_state = ky026_read_digital(sensor);
-            //ESP_LOGI(TAG, "digital_state: %d", digital_state);
+            float temperature = 0.0, humidity = 0.0;
+            if (dht11_read(&temperature, &humidity)) {
+                ESP_LOGI(TAG, "Temperature->%.1f C  Humidity->%.1f%%", temperature, humidity);
 
-            if (digital_state)
-            {
-                printf("Flame: %s", digital_state ?  "DETECTED" : "CLEARED"); // digital_active_low = true
-        
                 // Send progress updates
-                res.job_id = cmd.job_id;
-                res.progress = 100;
-                res.completed = 100;
-                res.sensor_digital_result = digital_state;
+                job_result.job_id = job.job_id;
+                job_result.progress = 100;
+                job_result.completed = 100;
+                job_result.temperature = temperature;
+                job_result.humidity = humidity;
 
-                xQueueSend(result_queue, &res, 0);
-            }   
+                xQueueSend(result_queue, &job_result, 0);                
+            }
 
             // // Simulate long-running process
             // for (int progress = 0; progress <= 100; progress += 10) {
@@ -68,25 +63,20 @@ static void worker_task(void *arg) {
     }
 }
 
-void app_main(void)
-{
-    ky026_config_t config = {
-        .digital_pin = GPIO_NUM_22,
-        .digital_active_low = true,
-        .adc_unit = ADC_UNIT_2,           // Safer choice with Wi-Fi
-        .analog_channel = ADC_CHANNEL_7,  // GPIO27 (ADC1_CH6)
-        .analog_atten = ADC_ATTEN_DB_12,  // Use DB_12 per v5.4 documentation 
-        .bit_width = ADC_BITWIDTH_12,
-        .analog_threshold = 2000,
-    };  
+void app_main(void) {
+    ESP_ERROR_CHECK(nvs_flash_init());
 
-    sensor = ky026_init(&config);
-    if (!sensor) {
-        ESP_LOGE(TAG, "Flame sensor initialization failed");
-    }
+    vTaskDelay(pdMS_TO_TICKS(100));
+
+    ESP_LOGI(TAG, "APP is start...\n");
+    ESP_LOGI(TAG, "IDF Version: %d.%d.%d", ESP_IDF_VERSION_MAJOR, ESP_IDF_VERSION_MINOR, ESP_IDF_VERSION_PATCH);
+    ESP_LOGI(TAG, "IDF version: %s", esp_get_idf_version());
+    ESP_LOGI(TAG, "Free memory: %lu bytes", esp_get_free_heap_size());
+
+    dht11_init(DHT11_GPIO_PIN);
 
     // Create queues
-    job_queue = xQueueCreate(5, sizeof(job_command_t));
+    job_queue = xQueueCreate(5, sizeof(job_t));
     result_queue = xQueueCreate(5, sizeof(job_result_t));
 
     // Create worker task
@@ -109,15 +99,13 @@ void app_main(void)
         .timer_period_ms = 5
     };
     esp_err_t err = lvgl_port_init(&lvgl_port_cfg);
-    if (err != ESP_OK)
-    {
+    if (err != ESP_OK) {
         ESP_LOGI(TAG, "lvgl_port_init() failed: %s", esp_err_to_name(err));
     } 
 
     // Initialize lvgl display
     lv_display_t *lvgl_display = lvgl_display_init(lcd_panel_io, lcd_panel);
-    if (lvgl_display == NULL)
-    {
+    if (lvgl_display == NULL) {
         ESP_LOGI(TAG, "fatal error in lvgl_display_init");
         esp_restart();
     }
@@ -134,7 +122,7 @@ void app_main(void)
     lvgl_port_add_touch(&lvgl_port_touch_cfg);
 
     // Rotate the display to landscape mode
-    ESP_ERROR_CHECK(lcd_rotate(lvgl_display, LV_DISPLAY_ROTATION_0));
+    ESP_ERROR_CHECK(lcd_rotate(lvgl_display, LV_DISPLAY_ROTATION_270));
 
     // Add lvgl_demo_ui to lvgl display
     lvgl_van_ui(lvgl_display);
@@ -142,8 +130,7 @@ void app_main(void)
     // Adjust lcd brightness to make it visible
     ESP_ERROR_CHECK(lcd_brightness_set(100));
 
-    while(1)
-    {
+    while(1) {
         vTaskDelay(pdMS_TO_TICKS(50));    
     }
 }

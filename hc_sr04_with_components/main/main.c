@@ -4,14 +4,16 @@
 #include "hc_sr04.h"
 
 #define TAG "main"
-#define GPIO_NUM_32 32
-#define GPIO_NUM_33 33
+// #define GPIO_NUM_32 32
+// #define GPIO_NUM_33 33
+#define GPIO_NUM_22 22
+#define GPIO_NUM_27 27
 
 void app_main(void)
 {
     hc_sr04_t sensor = {
-        .trig_gpio = GPIO_NUM_32,
-        .echo_gpio = GPIO_NUM_33,
+        .trig_gpio = GPIO_NUM_27,
+        .echo_gpio = GPIO_NUM_22,
     };
 
     if (!hc_sr04_init(&sensor))
@@ -23,7 +25,7 @@ void app_main(void)
     while (1)
     {
         float distance;
-        if (hc_sr04_measure_distance(&sensor, &distance, 1000))
+        if (hc_sr04_measure_distance(&sensor, &distance, 2000))
         {
             ESP_LOGI(TAG, "Distance: %.2f cm", distance);
         }

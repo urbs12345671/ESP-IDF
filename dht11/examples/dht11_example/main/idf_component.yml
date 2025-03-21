@@ -2,7 +2,7 @@
 dependencies:
   ## Required IDF version
   idf:
-    version: '>=5.2.0'
+    version: '>=5.4.0'
   # # Put list of dependencies here
   # # For components maintained by Espressif:
   # component: "~1.0.0"
@@ -16,9 +16,8 @@ dependencies:
   #   public: true
   espressif/esp_lcd_ili9341: ^2.0.0
   atanisoft/esp_lcd_touch_xpt2046: ^1.0.5
-  #lvgl/lvgl: ^9.2.2
   espressif/esp_lvgl_port: ^2.5.0
 
-  urbs12345671/ky026:
+  urbs12345671/dht11:
     version: "*"
-    override_path: "../../ky026"
+    override_path: "../../../"
