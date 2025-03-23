@@ -1,0 +1,7 @@
+dependencies:
+  espressif/esp32-camera:
+    version: "*"
+    override_path: "../../../"
+  urbs12345671/wifi:
+    version: "*"
+    override_path: "../../../../wifi"

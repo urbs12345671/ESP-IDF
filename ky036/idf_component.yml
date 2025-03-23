@@ -1,4 +1,4 @@
-# components/ky023/idf_component.yml
+# components/ky038/idf_component.yml
 idf_component_manifest:
   version: "1.0.0"
   description: "ESP-IDF component for KY-036 touch Controller"
@@ -6,7 +6,7 @@ idf_component_manifest:
   license: "MIT"
   dependencies:
     esp-idf:
-      version: ">=4.4"
+      version: ">=5.4"
   targets:
     - esp32
     - esp32s2

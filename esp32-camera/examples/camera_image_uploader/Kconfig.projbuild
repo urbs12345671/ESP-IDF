@@ -1,0 +1,9 @@
+# File: your_project/main/Kconfig.projbuild
+menu "WiFi Configuration"
+    config ESP_WIFI_TX_BUFFER_TYPE
+        int "WiFi TX Buffer Type"
+        range 0 1
+        default 1
+        help
+            Set to 1 for PSRAM buffers
+endmenu

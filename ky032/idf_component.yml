@@ -6,7 +6,7 @@ idf_component_manifest:
   license: "MIT"
   dependencies:
     esp-idf:
-      version: ">=4.4"
+      version: ">=5.4"
   targets:
     - esp32
     - esp32s2
